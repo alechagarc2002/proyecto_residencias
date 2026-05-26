@@ -47,10 +47,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import itch.tsp.config.ArchivoStorageService;
 
 @RequestMapping("/proyectoResidencia")
 @Controller
 public class ProyectoResidenciaController {
+
+	@Autowired
+	private ArchivoStorageService archivoStorageService;
+
+	@Autowired
+	private ProyectoResidenciaPdf proyectoResidenciaPdf;
 
 	@Autowired
 	private IProyectoResidenciaService proyectoResidenciaService;
@@ -325,8 +332,8 @@ public class ProyectoResidenciaController {
 				return ResponseEntity.notFound().build();
 			}
 
-			String nombreArchivo = ProyectoResidenciaPdf.generarPdf(proyectoResidencia);
-			File archivo = new File("C:/residencias/pdf/" + nombreArchivo);
+			String nombreArchivo = proyectoResidenciaPdf.generarPdf(proyectoResidencia);
+			File archivo = archivoStorageService.getRutaArchivo("pdf", nombreArchivo).toFile();
 
 			InputStreamResource resource = new InputStreamResource(new FileInputStream(archivo));
 
@@ -426,14 +433,10 @@ public class ProyectoResidenciaController {
 					periodoTexto
 			);
 
-			String ruta = "C:/residencias/documentos/";
-			File directorio = new File(ruta);
-			if (!directorio.exists()) {
-				directorio.mkdirs();
-			}
+			File directorio = archivoStorageService.getRutaDirectorio("documentos").toFile();
 
 			String nombreArchivo = "liberacion_" + proyecto.getIdProyectoResidencia() + ".pdf";
-			File archivo = new File(ruta + nombreArchivo);
+			File archivo = archivoStorageService.getRutaArchivo("documentos", nombreArchivo).toFile();
 
 			try (FileOutputStream fos = new FileOutputStream(archivo)) {
 				fos.write(pdf);

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import itch.tsp.config.ArchivoStorageService;
 import itch.tsp.modelo.ProyectoResidencia;
 import itch.tsp.modelo.ReportePreliminar;
 import itch.tsp.service.IProyectoResidenciaService;
@@ -37,6 +38,12 @@ import itch.tsp.util.ReportePreliminarPdf;
 @RequestMapping("/reportePreliminar")
 @Controller
 public class ReportePreliminarController {
+
+	@Autowired
+	private ArchivoStorageService archivoStorageService;
+
+	@Autowired
+	private ReportePreliminarPdf reportePreliminarPdf;
 
 	@Autowired
 	private IReportePreliminarService reportePreliminarService;
@@ -202,8 +209,8 @@ public class ReportePreliminarController {
 				return ResponseEntity.notFound().build();
 			}
 
-			String nombreArchivo = ReportePreliminarPdf.generarPdf(reportePreliminar);
-			File archivo = new File("C:/residencias/pdf/" + nombreArchivo);
+			String nombreArchivo = reportePreliminarPdf.generarPdf(reportePreliminar);
+			File archivo = archivoStorageService.getRutaArchivo("pdf", nombreArchivo).toFile();
 
 			InputStreamResource resource = new InputStreamResource(new FileInputStream(archivo));
 

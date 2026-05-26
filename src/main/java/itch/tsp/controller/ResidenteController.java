@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import itch.tsp.config.ArchivoStorageService;
 import itch.tsp.modelo.Residente;
 import itch.tsp.modelo.Usuario;
 import itch.tsp.repository.ResidenteRepository;
@@ -37,6 +38,9 @@ public class ResidenteController {
 
 	@Autowired
 	private ResidenteRepository residenteRepository;
+
+	@Autowired
+	private ArchivoStorageService archivoStorageService;
 
 	@GetMapping("/mostrarResidentes")
 	public String mostrarDatos(
@@ -108,16 +112,11 @@ public class ResidenteController {
 	    		}
 	    	}
 
-	        String ruta = "C:/residencias/residentes/";
-	        File directorio = new File(ruta);
-
-	        if (!directorio.exists()) {
-	            directorio.mkdirs();
-	        }
+	        File directorio = archivoStorageService.getRutaDirectorio("residentes").toFile();
 
 	        if (archivo != null && !archivo.isEmpty()) {
 	            String nombreArchivo = System.currentTimeMillis() + "_" + archivo.getOriginalFilename().replace(" ", "_");
-	            File destino = new File(ruta + nombreArchivo);
+	            File destino = archivoStorageService.getRutaArchivo("residentes", nombreArchivo).toFile();
 
 	            archivo.transferTo(destino);
 	            residente.setFoto(nombreArchivo);

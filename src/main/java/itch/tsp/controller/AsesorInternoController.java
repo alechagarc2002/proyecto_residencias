@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import itch.tsp.config.ArchivoStorageService;
 import itch.tsp.modelo.AsesorInterno;
 import itch.tsp.modelo.Usuario;
 import itch.tsp.repository.AsesorInternoRepository;
@@ -37,6 +38,9 @@ public class AsesorInternoController {
 
 	@Autowired
 	private AsesorInternoRepository asesorInternoRepository;
+
+	@Autowired
+	private ArchivoStorageService archivoStorageService;
 
 	@GetMapping("/mostrarAsesoresInternos")
 	public String mostrarDatos(
@@ -96,16 +100,11 @@ public class AsesorInternoController {
 	    		}
 	    	}
 
-	        String ruta = "C:/residencias/asesoresInternos/";
-	        File directorio = new File(ruta);
-
-	        if (!directorio.exists()) {
-	            directorio.mkdirs();
-	        }
+	        File directorio = archivoStorageService.getRutaDirectorio("asesoresInternos").toFile();
 
 	        if (archivo != null && !archivo.isEmpty()) {
 	            String nombreArchivo = System.currentTimeMillis() + "_" + archivo.getOriginalFilename().replace(" ", "_");
-	            File destino = new File(ruta + nombreArchivo);
+	            File destino = archivoStorageService.getRutaArchivo("asesoresInternos", nombreArchivo).toFile();
 
 	            archivo.transferTo(destino);
 	            asesorInterno.setFoto(nombreArchivo);

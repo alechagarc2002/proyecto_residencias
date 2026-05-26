@@ -8,6 +8,8 @@ import itch.tsp.modelo.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
+	Usuario findByUsername(String username);
+
 	Usuario findByUsernameAndEstatus(String username, Integer estatus);
 
 	List<Usuario> findByEstatus(Integer estatus);

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import itch.tsp.config.ArchivoStorageService;
 import itch.tsp.modelo.AsesorExterno;
 import itch.tsp.modelo.Usuario;
 import itch.tsp.repository.AsesorExternoRepository;
@@ -37,6 +38,9 @@ public class AsesorExternoController {
 
 	@Autowired
 	private AsesorExternoRepository asesorExternoRepository;
+
+	@Autowired
+	private ArchivoStorageService archivoStorageService;
 
 	@GetMapping("/mostrarAsesoresExternos")
 	public String mostrarDatos(
@@ -96,16 +100,11 @@ public class AsesorExternoController {
 	    		}
 	    	}
 
-	        String ruta = "C:/residencias/asesoresExternos/";
-	        File directorio = new File(ruta);
-
-	        if (!directorio.exists()) {
-	            directorio.mkdirs();
-	        }
+	        File directorio = archivoStorageService.getRutaDirectorio("asesoresExternos").toFile();
 
 	        if (archivo != null && !archivo.isEmpty()) {
 	            String nombreArchivo = System.currentTimeMillis() + "_" + archivo.getOriginalFilename().replace(" ", "_");
-	            File destino = new File(ruta + nombreArchivo);
+	            File destino = archivoStorageService.getRutaArchivo("asesoresExternos", nombreArchivo).toFile();
 
 	            archivo.transferTo(destino);
 	            asesorExterno.setFoto(nombreArchivo);

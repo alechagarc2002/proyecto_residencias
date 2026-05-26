@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import itch.tsp.config.ArchivoStorageService;
 import itch.tsp.modelo.DocumentoResidencia;
 import itch.tsp.service.IDocumentoResidenciaService;
 import itch.tsp.service.IProyectoResidenciaService;
@@ -39,6 +40,9 @@ public class DocumentoResidenciaController {
 
 	@Autowired
 	private IProyectoResidenciaService proyectoResidenciaService;
+
+	@Autowired
+	private ArchivoStorageService archivoStorageService;
 
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -82,16 +86,11 @@ public class DocumentoResidenciaController {
 			@RequestParam("archivo") MultipartFile archivo,
 			RedirectAttributes redirectAttributes) {
 
-		String ruta = "C:/residencias/documentos/";
-		File directorio = new File(ruta);
-
-		if (!directorio.exists()) {
-			directorio.mkdirs();
-		}
+		File directorio = archivoStorageService.getRutaDirectorio("documentos").toFile();
 
 		if (!archivo.isEmpty()) {
 			String nombreArchivo = System.currentTimeMillis() + "_" + archivo.getOriginalFilename().replace(" ", "_");
-			File destino = new File(ruta + nombreArchivo);
+			File destino = archivoStorageService.getRutaArchivo("documentos", nombreArchivo).toFile();
 			try {
 				archivo.transferTo(destino);
 				documentoResidencia.setNombreArchivo(nombreArchivo);
@@ -188,7 +187,7 @@ public class DocumentoResidenciaController {
 				return ResponseEntity.notFound().build();
 			}
 
-			File archivo = new File("C:/residencias/documentos/" + documentoResidencia.getRutaArchivo());
+			File archivo = archivoStorageService.getRutaArchivo("documentos", documentoResidencia.getRutaArchivo()).toFile();
 
 			if (!archivo.exists()) {
 				return ResponseEntity.notFound().build();

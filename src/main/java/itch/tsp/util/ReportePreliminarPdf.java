@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -18,20 +21,24 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import itch.tsp.config.ArchivoStorageService;
 import itch.tsp.modelo.ReportePreliminar;
 
+@Component
 public class ReportePreliminarPdf {
 
-	public static String generarPdf(ReportePreliminar reportePreliminar) throws Exception {
+	private final ArchivoStorageService archivoStorageService;
 
-		String rutaCarpeta = "C:/residencias/pdf/";
-		File carpeta = new File(rutaCarpeta);
-		if (!carpeta.exists()) {
-			carpeta.mkdirs();
-		}
+	public ReportePreliminarPdf(ArchivoStorageService archivoStorageService) {
+		this.archivoStorageService = archivoStorageService;
+	}
+
+	public String generarPdf(ReportePreliminar reportePreliminar) throws Exception {
+
+		File carpeta = archivoStorageService.getRutaDirectorio("pdf").toFile();
 
 		String nombreArchivo = "reporte_preliminar_" + reportePreliminar.getIdReportePreliminar() + ".pdf";
-		String rutaCompleta = rutaCarpeta + nombreArchivo;
+		String rutaCompleta = new File(carpeta, nombreArchivo).getAbsolutePath();
 
 		Document document = new Document(PageSize.A4, 36, 36, 36, 36);
 		PdfWriter.getInstance(document, new FileOutputStream(rutaCompleta));
@@ -53,7 +60,7 @@ public class ReportePreliminarPdf {
 		celdaLogo.setPaddingBottom(8f);
 
 		try {
-			Image logos = Image.getInstance("C:/residencias/logoteccompl.png");
+			Image logos = Image.getInstance(new ClassPathResource("static/img/logoteccompl.png").getURL());
 			logos.scaleToFit(500, 90);
 			logos.setAlignment(Element.ALIGN_CENTER);
 			celdaLogo.addElement(logos);
